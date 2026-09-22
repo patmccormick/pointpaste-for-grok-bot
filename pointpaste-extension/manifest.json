@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "PointPaste for Grok Bot",
+  "version": "1.0.0",
+  "description": "Pick a page element (or parent), add a note, copy a clipboard pack for Grok Bot. Optional Breakdance ids when present.",
+  "permissions": ["activeTab", "scripting", "clipboardWrite"],
+  "action": {
+    "default_title": "PointPaste → Grok Bot (Alt+Shift+G)",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "toggle-pick": {
+      "suggested_key": {
+        "default": "Alt+Shift+G",
+        "mac": "Alt+Shift+G"
+      },
+      "description": "Toggle PointPaste → copy for Grok Bot"
+    }
+  }
+}
