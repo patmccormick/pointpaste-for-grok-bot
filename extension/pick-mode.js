@@ -1,5 +1,5 @@
 /**
- * PointPaste — click an element, optionally climb parents, add a note, copy a pack for Grok Bot.
+ * PointTalk — click an element, optionally climb parents, add a note, copy a pack for Grok Bot.
  * Paste into Grok Bot chat. Works on any page (Breakdance ids included when present).
  */
 (function () {
@@ -13,8 +13,8 @@
     };
   }
 
-  if (window.__nvGrokPick && window.__nvGrokPick.active) {
-    window.__nvGrokPick.teardown();
+  if (window.__ppGrokPick && window.__ppGrokPick.active) {
+    window.__ppGrokPick.teardown();
     return;
   }
 
@@ -110,7 +110,7 @@
             )
             .join("\n");
     return [
-      "### Element pack for Norvado",
+      "### Element pack",
       note ? `**Ask:** ${note}` : "**Ask:** _(none — inspect / fix as needed)_",
       `**Page:** ${summary.href}`,
       `**Depth:** ${depthLabel}`,
@@ -132,7 +132,7 @@
   }
 
   const ui = document.createElement("div");
-  ui.id = "nv-grok-pick";
+  ui.id = "pp-grok-pick";
   Object.assign(ui.style, {
     position: "fixed",
     zIndex: "2147483646",
@@ -141,26 +141,26 @@
     width: "min(420px, calc(100vw - 32px))",
     maxHeight: "70vh",
     overflow: "auto",
-    background: "#0f3a37",
-    color: "#f3f3ec",
+    background: "#1f2937",
+    color: "#f3f4f6",
     font: "13px/1.4 system-ui, sans-serif",
     borderRadius: "12px",
     boxShadow: "0 12px 40px rgba(0,0,0,.35)",
     padding: "14px 14px 12px",
   });
   ui.innerHTML = `
-    <div style="font-weight:600;margin-bottom:6px">PointPaste → Grok Bot</div>
+    <div style="font-weight:600;margin-bottom:6px">PointTalk → Grok Bot</div>
     <div style="opacity:.85;margin-bottom:10px">Click any element. Pick a parent if needed. Add a note, then copy and paste into chat.</div>
     <label style="display:block;margin:0 0 4px;opacity:.8">Target</label>
-    <select id="nv-grok-depth" style="width:100%;margin-bottom:8px;padding:6px;border-radius:8px;border:0"></select>
+    <select id="pp-grok-depth" style="width:100%;margin-bottom:8px;padding:6px;border-radius:8px;border:0"></select>
     <label style="display:block;margin:0 0 4px;opacity:.8">Note (optional)</label>
-    <textarea id="nv-grok-note" rows="3" placeholder="e.g. stack these at tablet; gap too wide on mobile"
+    <textarea id="pp-grok-note" rows="3" placeholder="e.g. stack these at tablet; gap too wide on mobile"
       style="width:100%;box-sizing:border-box;margin-bottom:8px;padding:8px;border-radius:8px;border:0;resize:vertical"></textarea>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button id="nv-grok-copy" type="button" style="flex:1;padding:8px 10px;border:0;border-radius:8px;background:#93d500;color:#111614;font-weight:600;cursor:pointer">Copy for Grok Bot</button>
-      <button id="nv-grok-cancel" type="button" style="padding:8px 10px;border:0;border-radius:8px;background:#1a4f4a;color:#f3f3ec;cursor:pointer">Esc</button>
+      <button id="pp-grok-copy" type="button" style="flex:1;padding:8px 10px;border:0;border-radius:8px;background:#3b82f6;color:#ffffff;font-weight:600;cursor:pointer">Copy for Grok Bot</button>
+      <button id="pp-grok-cancel" type="button" style="padding:8px 10px;border:0;border-radius:8px;background:#374151;color:#f3f4f6;cursor:pointer">Esc</button>
     </div>
-    <div id="nv-grok-status" style="margin-top:8px;opacity:.85;min-height:1.2em"></div>
+    <div id="pp-grok-status" style="margin-top:8px;opacity:.85;min-height:1.2em"></div>
   `;
 
   const highlight = document.createElement("div");
@@ -168,8 +168,8 @@
     position: "fixed",
     pointerEvents: "none",
     zIndex: "2147483645",
-    border: "2px solid #93d500",
-    background: "rgba(147,213,0,.12)",
+    border: "2px solid #3b82f6",
+    background: "rgba(59,130,246,.15)",
     display: "none",
   });
 
@@ -192,7 +192,7 @@
   }
 
   function fillDepth() {
-    const sel = ui.querySelector("#nv-grok-depth");
+    const sel = ui.querySelector("#pp-grok-depth");
     sel.innerHTML = "";
     chain.forEach((item, i) => {
       const opt = document.createElement("option");
@@ -216,8 +216,8 @@
     selected = el;
     fillDepth();
     paintHighlight(el);
-    ui.querySelector("#nv-grok-status").textContent = "Selected. Climb parents in the list if you want a wrapper.";
-    ui.querySelector("#nv-grok-note").focus();
+    ui.querySelector("#pp-grok-status").textContent = "Selected. Climb parents in the list if you want a wrapper.";
+    ui.querySelector("#pp-grok-note").focus();
   }
 
   function onMove(e) {
@@ -228,16 +228,16 @@
 
   async function copyPack() {
     if (!selected) {
-      ui.querySelector("#nv-grok-status").textContent = "Click an element first.";
+      ui.querySelector("#pp-grok-status").textContent = "Click an element first.";
       return;
     }
-    const depth = Number(ui.querySelector("#nv-grok-depth").value) || 0;
+    const depth = Number(ui.querySelector("#pp-grok-depth").value) || 0;
     const item = chain[depth];
-    const note = ui.querySelector("#nv-grok-note").value.trim();
+    const note = ui.querySelector("#pp-grok-note").value.trim();
     const md = packMarkdown(summarize(item.el), note, item.label);
     try {
       await navigator.clipboard.writeText(md);
-      ui.querySelector("#nv-grok-status").textContent = "Copied. Paste into Grok Bot (⌘V).";
+      ui.querySelector("#pp-grok-status").textContent = "Copied. Paste into Grok Bot (⌘V).";
     } catch (err) {
       // fallback
       const ta = document.createElement("textarea");
@@ -246,7 +246,7 @@
       ta.select();
       document.execCommand("copy");
       ta.remove();
-      ui.querySelector("#nv-grok-status").textContent = "Copied (fallback). Paste into Grok Bot (⌘V).";
+      ui.querySelector("#pp-grok-status").textContent = "Copied (fallback). Paste into Grok Bot (⌘V).";
     }
   }
 
@@ -254,9 +254,10 @@
     document.removeEventListener("click", onClick, true);
     document.removeEventListener("mousemove", onMove, true);
     document.removeEventListener("keydown", onKey, true);
+    document.documentElement.style.cursor = "";
     ui.remove();
     highlight.remove();
-    window.__nvGrokPick = null;
+    window.__ppGrokPick = null;
   }
 
   function onKey(e) {
@@ -270,13 +271,15 @@
     }
   }
 
-  document.documentElement.appendChild(highlight);
-  document.documentElement.appendChild(ui);
+  const mount = document.body || document.documentElement;
+  mount.appendChild(highlight);
+  mount.appendChild(ui);
+  document.documentElement.style.cursor = "crosshair";
   document.addEventListener("click", onClick, true);
   document.addEventListener("mousemove", onMove, true);
   document.addEventListener("keydown", onKey, true);
-  ui.querySelector("#nv-grok-copy").onclick = copyPack;
-  ui.querySelector("#nv-grok-cancel").onclick = teardown;
-
-  window.__nvGrokPick = { active: true, teardown };
+  ui.querySelector("#pp-grok-copy").onclick = copyPack;
+  ui.querySelector("#pp-grok-cancel").onclick = teardown;
+  window.__ppGrokPick = { active: true, teardown };
+  ui.querySelector("#pp-grok-status").textContent = "Hover and click an element to select it.";
 })();
