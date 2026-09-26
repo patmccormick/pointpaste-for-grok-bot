@@ -65,8 +65,10 @@ Then:
 
 ### Using it
 
-- **Hold Right Option** (alone) to record; release to send. Taps shorter than 0.4 s are ignored; pressing any other key, modifier, or mouse button while holding cancels, so Option+letter still types normally. Max 60 s per message.
-- Menu bar: 🎙 idle, 🔴 recording, ⏳ transcribing, 📤 sending, 📎 a PointTalk capture is waiting.
+- **Hold Right Option** (alone) to record; release to send. Taps shorter than 0.4 s are ignored; pressing any other key, modifier, or mouse button while holding cancels that hold, so Option+letter still types normally. Max 60 s per hold.
+- **Forgot something? Press Right Option again.** While your message is still transcribing, or during the 1.5 s *"Sending in 1s — hold Right Option to add more"* window after transcription, holding Right Option again cancels the pending send and records more. Everything is sent as **one** message: `first part` + `Added: second part`. You can add as many parts as you like. Once the pill says **📤 Sending…** it's too late to add; a new press then starts a separate message. Music stays paused until the final message is sent (or cancelled), then resumes if PointTalk paused it.
+- **Voice replies.** Turn on **Voice replies** in the 🎙 menu (remembered across restarts), or start or end a single message with *"voice reply"* or *"reply by voice"* (the phrase is removed from the text). The message then includes `"reply_as": "voice_memo"` and ends with `(Reply as a voice memo.)`, so your Grok Bot routine can answer with audio.
+- Menu bar: 🎙 idle, 🔴 recording, ⏳ transcribing, ⏱ about to send (re-press to add more), 📤 sending, 📎 a PointTalk capture is waiting.
 - Stuck? **Ctrl+Option+Cmd+Esc** force-resets, or use the menu bar icon. Log: `~/.hammerspoon/voice_ptt.log`.
 
 What gets POSTed (JSON) to your webhook:
@@ -77,14 +79,19 @@ What gets POSTed (JSON) to your webhook:
   "page_url": "active Brave tab URL (if Brave is running)",
   "page_title": "tab title",
   "page_app_frontmost": true,
-  "context": "PointTalk pack copied in the last 5 min (optional, max 20 KB)"
+  "context": "PointTalk pack copied in the last 5 min (optional, max 20 KB)",
+  "reply_as": "voice_memo"
 }
 ```
+
+`reply_as` is present only when a voice reply was requested.
+
+States: `idle → recording → transcribing → grace (1.5 s) → sending → idle`. Pressing Right Option in *transcribing* or *grace* goes back to *recording* for the same message. Pressing it in *sending* starts a new message.
 
 ## Getting a webhook URL and key from Grok Bot
 
 1. In Grok Bot, create a new **routine** and choose a **webhook** trigger.
-2. Tell the routine what to do with incoming messages (e.g. "Treat `text` as a request from me; use `page_url`, `page_title`, and `context` when present").
+2. Tell the routine what to do with incoming messages (e.g. "Treat `text` as a request from me; use `page_url`, `page_title`, and `context` when present; if `reply_as` is `voice_memo`, reply with a voice memo").
 3. Save it and copy the webhook **URL** and **key** it gives you.
 4. Put them in `~/.hammerspoon/voice-webhook.json` as `url` and `authorization` (`"Bearer "` + key). Use the same values in the iPhone Shortcut.
 
